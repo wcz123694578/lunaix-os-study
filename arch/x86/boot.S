@@ -10,10 +10,11 @@
     .align 16
     // x86栈地址由高地址向低地址增长
     stack_bottom:
-        .skip 16384, 0
+        .skip 16318, 0
     stack_top:
 
 .section .text
+    .global start_
     start_:
         movl $stack_top, %esp
         // TODO: kernel init
