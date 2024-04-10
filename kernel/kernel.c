@@ -1,7 +1,9 @@
 #include <lunaix/tty/tty.h>
+#include <lunaix/arch/gdt.h>
 
 void _kernel_init() {
     // TODO
+    _init_gdt();
 }
 
 void _kernel_main(void* info_table) {
