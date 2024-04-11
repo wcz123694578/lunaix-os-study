@@ -49,11 +49,14 @@ void tty_scroll_up()    {
     // TODO: use memcpy
 }
 void tty_clear()    {
-    for (uint32_t x = 0; x < TTY_WIDTH; x++)    {
-        for (uint32_t y = 0; y < TTY_HEIGHT; y++)
+    for (uint32_t x = 0; x < TTY_HEIGHT; x++)    {
+        for (uint32_t y = 0; y < TTY_WIDTH; y++)
         {
-            *(buffer + x + y * TTY_WIDTH) = theme_color;    // 把低8位置0
+            *(buffer + x * TTY_WIDTH + y) = theme_color;    // 把低8位置0
         }   
     }
+
+    TTY_COLUMN = 0;
+    TTY_ROW = 0;
 }
 

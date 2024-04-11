@@ -27,10 +27,17 @@
 
         /* 加载gdtr */
         subl $0x6, %esp     // 移动栈顶的指针，腾出6个bytes的空间
+        
         movl $_gdt, 2(%esp) 
         movw _gdt_limit, %ax
         movw %ax, (%esp)
         lgdt (%esp)
+        /* 加载idtr */
+        movl $_idt, 2(%esp) 
+        movw _idt_limit, %ax
+        movw %ax, (%esp)
+        lidt (%esp)
+
         addl $0x6, %esp
 
         /* 初始化段寄存器 */
