@@ -1,3 +1,6 @@
+#ifndef __LUNAIX_GDT_H
+#define __LUNAIX_GDT_H 1
+
 /* SD各个位的值 */
 #define SD_TYPE(x)          (x << 8)
 #define SD_CODE_DATA(x)     (x << 12)
@@ -48,3 +51,4 @@
                             SD_4K_GRAN(1)
 
 void _init_gdt();
+#endif

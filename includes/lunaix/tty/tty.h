@@ -1,4 +1,7 @@
-typedef unsigned short vga_attributes;
+#ifndef __LUNAIX_TTY_H
+#define __LUNAIX_TTY_H
+
+typedef unsigned short vga_attribute;
 
 /* VGA显示颜色 */
 #define VGA_COLOR_BLACK 0
@@ -18,9 +21,12 @@ typedef unsigned short vga_attributes;
 #define VGA_COLOR_LIGHT_BROWN 14
 #define VGA_COLOR_WHITE 15
 
-void tty_set_theme(vga_attributes fg, vga_attributes bg);
+void tty_init(void* vga_buf);
+void tty_set_buffer(void* vga_buf);
+void tty_set_theme(vga_attribute fg, vga_attribute bg);
 void tty_put_char(char chr);    // 输出字符
 void tty_put_str(char* str);    // 输出字符串
 void tty_scroll_up();           // 上滚
 void tty_clear();
 
+#endif /* __LUNAIX_TTY_H */

@@ -1,62 +1,87 @@
+#include <libc/string.h>
 #include <lunaix/tty/tty.h>
+#include <lunaix/constants.h>
 #include <stdint.h>
 
 #define TTY_WIDTH 80
 #define TTY_HEIGHT 25
 
-vga_attributes *buffer = 0xB8000;    // 显存开始的地址
-vga_attributes theme_color = VGA_COLOR_BLACK;
+vga_attribute* tty_vga_buffer = (vga_attribute*)VGA_BUFFER_PADDR;
 
-uint32_t TTY_COLUMN = 0;
-uint16_t TTY_ROW = 0;
+vga_attribute tty_theme_color = VGA_COLOR_BLACK;
 
-void tty_set_theme(vga_attributes fg, vga_attributes bg)    {
-    theme_color = (bg << 4 | fg) << 8;  // 前景色占4位，前景色开始位在第8位
+uint32_t tty_x = 0;
+uint16_t tty_y = 0;
+
+void tty_init(void* vga_buf) {
+    tty_vga_buffer = (vga_attribute*)vga_buf;
+    tty_clear();
 }
-void tty_put_char(char chr) {
-    if (chr == '\n')    {
-        TTY_COLUMN = 0;
-        TTY_ROW++;
-        
+
+void tty_set_buffer(void* vga_buf) {
+    tty_vga_buffer = (vga_attribute*)vga_buf;
+}
+
+void
+tty_set_theme(vga_attribute fg, vga_attribute bg)
+{
+    tty_theme_color = (bg << 4 | fg) << 8;
+}
+
+void
+tty_put_char(char chr)
+{
+    switch (chr) {
+        case '\t':
+            tty_x += 4;
+            break;
+        case '\n':
+            tty_y++;
+            // fall through
+        case '\r':
+            tty_x = 0;
+            break;
+        default:
+            *(tty_vga_buffer + tty_x + tty_y * TTY_WIDTH) = (tty_theme_color | chr);
+            tty_x++;
+            break;
     }
 
-    else if (chr == '\r')    {
-        TTY_COLUMN = 0;
+    if (tty_x >= TTY_WIDTH) {
+        tty_x = 0;
+        tty_y++;
     }
-
-    else    {
-        *(buffer + TTY_COLUMN + TTY_ROW * TTY_WIDTH) = (theme_color | chr);
-        TTY_COLUMN++;
-        if (TTY_COLUMN >= TTY_WIDTH)    {
-            TTY_COLUMN = 0;
-            TTY_ROW++;
-        }
-    }
-
-    if (TTY_ROW >= TTY_HEIGHT)  {
+    if (tty_y >= TTY_HEIGHT) {
         tty_scroll_up();
-        TTY_ROW--;
     }
 }
-void tty_put_str(char* str) {
-    while (*str != '\0')    {
+
+void
+tty_put_str(char* str)
+{
+    while (*str != '\0') {
         tty_put_char(*str);
         str++;
     }
-    
 }
-void tty_scroll_up()    {
-    // TODO: use memcpy
-}
-void tty_clear()    {
-    for (uint32_t x = 0; x < TTY_HEIGHT; x++)    {
-        for (uint32_t y = 0; y < TTY_WIDTH; y++)
-        {
-            *(buffer + x * TTY_WIDTH + y) = theme_color;    // 把低8位置0
-        }   
+
+void
+tty_scroll_up()
+{
+    size_t last_line = TTY_WIDTH * (TTY_HEIGHT - 1);
+    memcpy(tty_vga_buffer, tty_vga_buffer + TTY_WIDTH, last_line * 2);
+    for (size_t i = 0; i < TTY_WIDTH; i++) {
+        *(tty_vga_buffer + i + last_line) = tty_theme_color;
     }
-
-    TTY_COLUMN = 0;
-    TTY_ROW = 0;
+    tty_y = tty_y == 0 ? 0 : TTY_HEIGHT - 1;
 }
 
+void
+tty_clear()
+{
+    for (uint32_t i = 0; i < TTY_WIDTH * TTY_HEIGHT; i++) {
+        *(tty_vga_buffer + i) = tty_theme_color;
+    }
+    tty_x = 0;
+    tty_y = 0;
+}

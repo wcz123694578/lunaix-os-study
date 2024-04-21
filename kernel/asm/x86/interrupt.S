@@ -1,5 +1,3 @@
-// #include <lunaix/interrupts/interrupts.h>
-
 .macro isr_template vector, no_error_code=1
     .global _asm_isr\vector
     .type _asm_isr\vector, @function

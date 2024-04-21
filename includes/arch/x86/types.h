@@ -1,3 +1,6 @@
+#ifndef __LUNAIX_TYPES_H
+#define __LUNAIX_TYPES_H
+
 /* CPU预留中断 */
 #define FAULT_DIVISION_ERROR            0x00
 #define FAULT_TRAP_DEBUG_EXCEPTION      0x01
@@ -22,16 +25,4 @@
 #define FAULT_VIRTUALIZATION_EXCEPTION  0x14
 #define FAULT_CONTROL_PROTECTION        0x15
 
-#pragma pack(push, 1)
-typedef struct  {
-    unsigned int vector;
-    unsigned int error_code;
-    unsigned int eip;
-    unsigned short cs;
-    unsigned int eflags;
-} isr_param;
-#pragma pack(pop)
-
-void _asm_isr0();
-
-void interrupt_handler(isr_param* param);
+#endif

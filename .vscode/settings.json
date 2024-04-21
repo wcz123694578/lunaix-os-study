@@ -2,6 +2,12 @@
     "files.associations": {
         "stdint.h": "c",
         "tty.h": "c",
-        "gdt.h": "c"
+        "gdt.h": "c",
+        "multiboot.h": "c",
+        "page.h": "c",
+        "idt.h": "c",
+        "interrupts.h": "c",
+        "vmm.h": "c",
+        "constants.h": "c"
     }
 }
